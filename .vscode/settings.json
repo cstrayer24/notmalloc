@@ -1,0 +1,19 @@
+{
+    "files.associations": {
+        "stab.h": "c",
+        "unistd.h": "c",
+        "fcntl.h": "c",
+        "stdio.h": "c",
+        "debug.h": "c",
+        "stdarg.h": "c",
+        "string.h": "c",
+        "availability.h": "c",
+        "raylib.h": "c",
+        "allocator.h": "c",
+        "ass.h": "c",
+        "align.h": "c",
+        "sysmem.h": "c",
+        "chunk.h": "c"
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/clang"
+}
