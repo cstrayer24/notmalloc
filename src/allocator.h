@@ -4,7 +4,7 @@
 extern "C"
 {
 #endif
-#include <strings.h>
+#include <strings.h> //for size_t
 
     void *notmalloc(size_t size);
 

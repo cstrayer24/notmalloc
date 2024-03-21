@@ -1,15 +1,11 @@
-#include "sysmem.h"
-#include "../debug/debug.h"
+#include "./sysmem.h"
+#include "debug/debug.h"
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
 
-#ifdef __APPLE__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#endif
 page_t getPage()
 {
     page_t pg;
@@ -26,4 +22,27 @@ page_t getPage()
     }
 
     return pg;
+}
+
+int sysfree(nmchunk_t *chunk)
+{
+
+    if (chunk == NULL)
+    {
+
+        return -1;
+    }
+    if (!chunk->isfree)
+    {
+
+        return -1;
+    }
+
+    if (munmap(chunk, sizeof(nmchunk_t) + chunk->size) == -1)
+    {
+
+        return -1;
+    }
+
+    return 0;
 }

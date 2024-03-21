@@ -1,23 +1,34 @@
 #include "./allocator.h"
 #include "./debug/debug.h"
-#include "./systemMem/sysmem.h"
+#include "./sysmem.h"
 #include "./align.h"
-#include "./chunk/chunk.h"
+#include "./chunk.h"
+#include "fl.h"
+
+static fl_t fl;
+static bool flHasBeenInit = false;
 void *notmalloc(size_t size)
 {
-
-    page_t pg = getPage();
-    int numChunks;
-    nmchunk_t *chunck = chunkifyPage(pg, &numChunks);
-    nmchunk_t *temp = chunck;
-#ifdef DEBUG
-    printInfo("called align with size %lu got %lu", size, align(size));
-    printInfo("numChunks is %d", numChunks);
-#endif /*DEBUG*/
-    for (int i = 0; i < numChunks; i++)
+    // chunkifyPageN(getPage(), 9, 32);
+    // hack alert
+    if (!flHasBeenInit)
     {
+        init_fl(&fl);
+        flHasBeenInit = true;
+    }
+    if (fl_isEmpty(&fl))
+    {
+        // just stick 10 in here and change it when the inuse list gets implemented
+        fl.start = chunkifyPageN(getPage(), 10, align(size));
+        fl.maxSize = align(size);
+        fl.minSize = align(size);
+        fl.curr = fl.start;
+        nmchunk_t *temp = fl.curr;
+        for (int i = 0; i < 10; i++)
+        {
 
-        printInfo("on iteration %d the chunck size is %lu and its freedness is %d", i, temp->size, temp->isfree);
-        temp = temp->next;
+            temp = temp->next;
+        }
+        fl.end = temp;
     }
 }

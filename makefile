@@ -8,6 +8,8 @@ LIBFLAGS=
 LIBTARGET=
 osname:=$(shell uname -s)
 OBJS = $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/obj/%.o,$(wildcard $(SRCDIR)/*.c))
+SYSMEM=$(patsubst $(SRCDIR)/systemMem/%.c,$(BUILDDIR)/obj/%.o,$(wildcard $(SRCDIR)/systemMem/*.c))
+$(info $(SYSMEM))
 ifdef DEBUG
 	PPMACROS=-DDEBUG
 endif
@@ -27,15 +29,9 @@ build-lib:$(OBJS)
 	$(CC) $(wildcard $(BUILDDIR)/obj/*.o)  $(LIBFLAGS) -o $(BUILDDIR)/lib/$(LIBTARGET)
 
 
-
-$(OBJDIR)/%.o:$(SRCDIR)/%.c build-sysmem build-debug build-chunks
+$(OBJDIR)/%.o:$(SRCDIR)/%.c build-debug 
 	$(CC) $(CFLAGS) $(PPMACROS) -c $< -o $@
 
-
-build-chunks:build-sysmem
-	$(CC) $(CFLAGS) $(PPMACROS) -c $(wildcard $(SRCDIR)/chunk/*.c) -o $(OBJDIR)/chunks.o
-build-sysmem:build-debug
-	$(CC) $(CFLAGS) $(PPMACROS)  $(wildcard $(SRCDIR)/systemMem/*.c) -c -o $(BUILDDIR)/obj/systemMem.o
 
 
 build-debug:

@@ -2,8 +2,8 @@
 #define __NMALIGN__
 #include <stdint.h>
 #include <string.h>
-#include "./systemMem/sysmem.h"
-#include "./chunk/chunk.h"
+#include "./sysmem.h"
+#include "./chunk.h"
 // this is here since alignment with the architecture is generally based on the system word
 typedef intptr_t word_t;
 // align with the system word
