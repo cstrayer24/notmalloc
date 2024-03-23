@@ -9,7 +9,7 @@ extern "C"
 #include "smTypes.h"
     // typedef void *page_t;
     page_t getPage();
-    int sysfree(nmchunk_t *chunk);
+    int sysfree(void *startPtr, size_t size);
 #ifdef __cplusplus
 }
 #endif

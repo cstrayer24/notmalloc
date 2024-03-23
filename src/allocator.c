@@ -9,7 +9,7 @@ static fl_t fl;
 static bool flHasBeenInit = false;
 void *notmalloc(size_t size)
 {
-    // chunkifyPageN(getPage(), 9, 32);
+    const size_t alignedSize = align(size);
     // hack alert
     if (!flHasBeenInit)
     {
@@ -19,9 +19,9 @@ void *notmalloc(size_t size)
     if (fl_isEmpty(&fl))
     {
         // just stick 10 in here and change it when the inuse list gets implemented
-        fl.start = chunkifyPageN(getPage(), 10, align(size));
-        fl.maxSize = align(size);
-        fl.minSize = align(size);
+        fl.start = chunkifyPageN(getPage(), 10, alignedSize);
+        fl.maxSize = alignedSize;
+        fl.minSize = alignedSize;
         fl.curr = fl.start;
         nmchunk_t *temp = fl.curr;
         for (int i = 0; i < 10; i++)
@@ -31,4 +31,5 @@ void *notmalloc(size_t size)
         }
         fl.end = temp;
     }
+    // end needs setup
 }

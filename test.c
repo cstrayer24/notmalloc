@@ -3,6 +3,6 @@
 int main()
 {
 
-    notmalloc(420);
-    // notmalloc(420);
+    int *mi = notmalloc(12);
+    *mi = 7;
 }

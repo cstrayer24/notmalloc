@@ -101,4 +101,6 @@ nmchunk_t *chunkifyPageN(page_t pg, int numchunk, size_t size)
             currentPtr -= decSize;
         }
     }
+    // we lose some memory try recycling or unmapping it
+    return chainStart;
 }
