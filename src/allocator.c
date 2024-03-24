@@ -9,7 +9,8 @@ static fl_t fl;
 static bool flHasBeenInit = false;
 void *notmalloc(size_t size)
 {
-    const size_t alignedSize = align(size);
+
+        const size_t alignedSize = align(size);
     // hack alert
     if (!flHasBeenInit)
     {
@@ -31,5 +32,4 @@ void *notmalloc(size_t size)
         }
         fl.end = temp;
     }
-    // end needs setup
 }

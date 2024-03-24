@@ -10,7 +10,7 @@ extern "C"
 #include "sysmem.h"
 #include "chunkTypes.h"
 #include "smTypes.h"
-#define DEFchunkSIZE 16
+#define DEFchunkSIZE 2048
 #define NMCHUNK struct nmchunk
     nmchunk_t *chunkifyPage(page_t pg, int *numchunk);
     nmchunk_t *chunkifyPageN(page_t pg, int numchunk, size_t size);

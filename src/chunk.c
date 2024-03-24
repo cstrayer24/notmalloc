@@ -3,14 +3,22 @@
 #include "debug/debug.h"
 #include <unistd.h>
 // default chunk size play around with this value to minimize truncate and expansion operations
-#define DEFchunkSIZE 16
+// #define DEFchunkSIZE 2048
 
 nmchunk_t *chunkifyPage(page_t pg, int *numchunk)
 {
 
     const int numPossible = getpagesize() / (sizeof(nmchunk_t) + DEFchunkSIZE);
+#ifdef DEBUG
+    printInfo("numPossible is %d", numPossible);
+
+#endif
     nmchunk_t *chainStart = chunkifyPageN(pg, numPossible, DEFchunkSIZE);
-    *numchunk = numPossible;
+    if (numchunk != NULL)
+    {
+
+        *numchunk = numPossible;
+    }
     //     void *currentPtr = pg + getpagesize();
     // #ifdef DEBUG
     //     printInfo("the number of possible chunks is %d", numPossible);
@@ -91,10 +99,6 @@ nmchunk_t *chunkifyPageN(page_t pg, int numchunk, size_t size)
             currChunk->next = newchunk;
             currChunk = newchunk;
         }
-#ifdef DEBUG
-        printInfo("currentPtr is %u", currentPtr);
-        // printInfo("iteration number is %d", i);
-#endif
 
         if ((currentPtr - decSize) > pg)
         {
@@ -102,5 +106,12 @@ nmchunk_t *chunkifyPageN(page_t pg, int numchunk, size_t size)
         }
     }
     // we lose some memory try recycling or unmapping it
+    printInfo("the amount of space between the pointetrs is %lu", currentPtr - pg);
+    size_t unmapSpace = currentPtr - pg;
+
+    // if (sysfree(pg, unmapSpace) <= -1)
+    // {
+    //     printErr("err for sysfree");
+    // }
     return chainStart;
 }

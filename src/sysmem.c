@@ -26,6 +26,10 @@ page_t getPage()
 
 int sysfree(void *startPtr, size_t size)
 {
-
-       return 0;
+    if (munmap(startPtr, size) == -1)
+    {
+        perror("munmap");
+        return -1;
+    }
+    return 0;
 }

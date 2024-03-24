@@ -2,7 +2,5 @@
 
 int main()
 {
-
-    int *mi = notmalloc(12);
-    *mi = 7;
+    notmalloc(12);
 }
