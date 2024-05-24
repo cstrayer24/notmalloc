@@ -9,21 +9,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <stdio.h>
-static fl_t fl;
-static ul_t ul;
 
-static nmchunk_t *getBelowSizedChunk(nmchunk_t *chunk, size_t size)
-{
-
-    if (chunk->size == size)
-    {
-
-        return chunk;
-    }
-    nmchunk_t *newChunk = subDivideChunk(chunk);
-
-    return getBelowSizedChunk(chunk, size);
-}
 static struct MEM_HEAP
 {
 
@@ -31,7 +17,8 @@ static struct MEM_HEAP
     size_t size;
     size_t amntFree;
     size_t amntUsed;
-} heap = {};
+} heap;
+
 static bool _initheap(struct MEM_HEAP *heap)
 {
 
@@ -81,13 +68,11 @@ bool expandHeap(struct MEM_HEAP *heap, size_t targetSize)
 nmchunk_t *getChunk(struct MEM_HEAP *heap, size_t size)
 {
 
-    printInfo("heap contents is %p", heap->contents);
 
     if (heap->amntFree <= size | heap->amntFree - size <= 0)
     {
         size_t targetSize = heap->size + size;
         expandHeap(heap, targetSize);
-        // expand heap
     }
     size_t totalSize = sizeof(nmchunk_t) + size;
     nmchunk_t *chunk = (nmchunk_t *)((void *)heap->contents + heap->amntUsed);
@@ -105,9 +90,12 @@ void *notmalloc(size_t size)
     size_t alignedSize = align(size);
     if (!initheap(&heap))
     {
-        printInfo("here");
         return NULL;
     }
+    nmchunk_t *newChunk;
 
-    return getChunk(&heap, alignedSize)->data;
+    newChunk = getChunk(&heap, alignedSize);
+    newChunk->next = NULL;
+    newChunk->prev = NULL;
+    return newChunk->data;
 }
