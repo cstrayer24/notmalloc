@@ -23,8 +23,17 @@ page_t getPage()
 
     return pg;
 }
+bool expandPage(page_t page)
+{
+    if (mmap(page, getpagesize(), PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0) == MAP_FAILED)
+    {
 
-int sysfree(void *startPtr, size_t size)
+        return 0;
+    }
+
+    return 1;
+}
+bool sysfree(void *startPtr, size_t size)
 {
     if (munmap(startPtr, size) == -1)
     {

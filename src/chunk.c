@@ -2,6 +2,7 @@
 #include "./sysmem.h"
 #include "debug/debug.h"
 #include <unistd.h>
+#include "./align.h"
 // default chunk size play around with this value to minimize truncate and expansion operations
 // #define DEFchunkSIZE 2048
 
@@ -13,7 +14,7 @@ nmchunk_t *chunkifyPage(page_t pg, int *numchunk)
     printInfo("numPossible is %d", numPossible);
 
 #endif
-    nmchunk_t *chainStart = chunkifyPageN(pg, numPossible, DEFchunkSIZE);
+    nmchunk_t *chainStart = chunkifyPageSN(pg, numPossible, DEFchunkSIZE);
     if (numchunk != NULL)
     {
 
@@ -68,8 +69,29 @@ nmchunk_t *chunkifyPage(page_t pg, int *numchunk)
 
     return chainStart;
 }
+nmchunk_t *chunkifyPageN(page_t pg, int numchunk, size_t *chunkSize)
+{
 
-nmchunk_t *chunkifyPageN(page_t pg, int numchunk, size_t size)
+    size_t sizeOfChunks = getpagesize() / numchunk;
+
+    sizeOfChunks -= sizeof(nmchunk_t);
+    *chunkSize = sizeOfChunks;
+    nmchunk_t *chainStart = chunkifyPageSN(pg, numchunk, sizeOfChunks);
+
+    return chainStart;
+}
+nmchunk_t *chunkifyPageS(page_t pg, size_t chunkSize, int *numChunks)
+{
+
+    const int chunkNum = getpagesize() / (sizeof(nmchunk_t) + align(chunkSize));
+
+    *numChunks = chunkNum;
+    nmchunk_t *chainStart = chunkifyPageSN(pg, chunkNum, align(chunkSize));
+
+    return chainStart;
+}
+
+nmchunk_t *chunkifyPageSN(page_t pg, int numchunk, size_t size)
 {
 
     const size_t decSize = sizeof(nmchunk_t) + size;
@@ -109,9 +131,38 @@ nmchunk_t *chunkifyPageN(page_t pg, int numchunk, size_t size)
     printInfo("the amount of space between the pointetrs is %lu", currentPtr - pg);
     size_t unmapSpace = currentPtr - pg;
 
-    // if (sysfree(pg, unmapSpace) <= -1)
-    // {
-    //     printErr("err for sysfree");
-    // }
     return chainStart;
+}
+
+nmchunk_t *subDivideChunk(nmchunk_t *chunk)
+{
+
+    if (chunk->size % 2 != 0)
+    {
+
+        return NULL;
+    }
+    if (!chunk->isfree)
+    {
+
+        return NULL;
+    }
+    const size_t amount = alignForChunk(chunk->size / 2);
+
+#ifdef DEBUG
+    printInfo("the amount is %lu ", amount);
+#endif
+
+    nmchunk_t *newChunk = chunk->data + amount;
+    newChunk->size = chunk->size / 2;
+    newChunk->data = (void *)newChunk + sizeof(nmheader_t);
+    chunk->size /= 2;
+    nmchunk_t *temp = chunk->next;
+
+    chunk->next = newChunk;
+    newChunk->next = temp;
+    newChunk->prev = chunk;
+    newChunk->size = chunk->size;
+
+    return newChunk;
 }

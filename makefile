@@ -21,7 +21,7 @@ endif
 
 all:build-lib
 ifdef DEBUG
-	$(CC) $(CFLAGS) test.c -L$(BUILDDIR)/lib -lnotmalloc -o $(BUILDDIR)/test
+	$(CC) $(CFLAGS) test.c  -I./src/ -L$(BUILDDIR)/lib -lnotmalloc -o $(BUILDDIR)/test
 endif
 
 
@@ -42,6 +42,4 @@ endif
 
 
 clean:
-	rm -rf $(OBJDIR)/*
-	rm -rf $(BUILDDIR)/lib/*
-	rm -rf $(BUILDDIR)/test
+	rm -rf $(BUILDDIR)/*

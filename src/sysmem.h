@@ -5,11 +5,11 @@
 extern "C"
 {
 #endif
-#include "./chunk.h"
+#include "chunk.h"
 #include "smTypes.h"
-    // typedef void *page_t;
     page_t getPage();
-    int sysfree(void *startPtr, size_t size);
+    bool sysfree(void *startPtr, size_t size);
+    bool expandPage(page_t page);
 #ifdef __cplusplus
 }
 #endif
