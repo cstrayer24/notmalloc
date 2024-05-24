@@ -1,10 +1,7 @@
-// #include "./chunk.h"
 #include "./sysmem.h"
 #include "debug/debug.h"
 #include <unistd.h>
 #include "./align.h"
-// default chunk size play around with this value to minimize truncate and expansion operations
-// #define DEFchunkSIZE 2048
 
 nmchunk_t *chunkifyPage(page_t pg, int *numchunk)
 {
@@ -20,53 +17,6 @@ nmchunk_t *chunkifyPage(page_t pg, int *numchunk)
 
         *numchunk = numPossible;
     }
-    //     void *currentPtr = pg + getpagesize();
-    // #ifdef DEBUG
-    //     printInfo("the number of possible chunks is %d", numPossible);
-    //     printInfo("the address of the numChunks is %p");
-    // #endif
-    //     // keep track of start and current
-    //     nmchunk_t *chainStart = NULL;
-    //     nmchunk_t *currChunk = NULL;
-    //     int i;
-    //     for (i = 0; i < numPossible; i++)
-    //     {
-
-    //         nmchunk_t *newchunk = currentPtr - (sizeof(nmchunk_t) + DEFchunkSIZE);
-    //         newchunk->data = currentPtr - DEFchunkSIZE;
-    //         newchunk->isfree = true;
-    //         newchunk->size = DEFchunkSIZE;
-    //         // handle first iteration
-    //         if (chainStart == NULL && currChunk == NULL)
-    //         {
-    //             newchunk->prev = NULL;
-    //             newchunk->next = NULL;
-    //             chainStart = newchunk;
-    //             currChunk = newchunk;
-    //         }
-    //         else
-    //         {
-
-    //             newchunk->prev = currChunk;
-    //             currChunk->next = newchunk;
-    //             currChunk = newchunk;
-    //         }
-    // #ifdef DEBUG
-    //         printInfo("currentPtr is %u", currentPtr);
-    //         // printInfo("iteration number is %d", i);
-    // #endif
-
-    //         if (currentPtr - (sizeof(nmchunk_t) + DEFchunkSIZE) > pg)
-    //         {
-    //             currentPtr -= (sizeof(nmchunk_t) + DEFchunkSIZE);
-    //         }
-    //     }
-    //     if (numchunk != NULL)
-    //     {
-
-    //         *numchunk = i;
-    //     }
-
     return chainStart;
 }
 nmchunk_t *chunkifyPageN(page_t pg, int numchunk, size_t *chunkSize)
@@ -165,4 +115,11 @@ nmchunk_t *subDivideChunk(nmchunk_t *chunk)
     newChunk->size = chunk->size;
 
     return newChunk;
+}
+
+nmchunk_t *getHeader(void *mem)
+{
+    // look in the asm for as to why the address is off by 8
+    nmchunk_t *chunk = (mem - sizeof(nmheader_t) - 8);
+    return chunk;
 }

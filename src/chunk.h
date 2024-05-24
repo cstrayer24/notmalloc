@@ -17,6 +17,7 @@ extern "C"
     nmchunk_t *chunkifyPageN(page_t pg, int numchunk, size_t *chunkSize);
     nmchunk_t *chunkifyPageS(page_t pg, size_t chunkSize, int *numChunks);
     nmchunk_t *subDivideChunk(nmchunk_t *chunk);
+    nmchunk_t *getHeader(void *rawPtr);
 
 #ifdef __cplusplus
 }
