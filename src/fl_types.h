@@ -1,7 +1,7 @@
 #ifndef __NMFLTYPES__
 #define __NMFLTYPES__
 #include <string.h>
-#include "chunkTypes.h"
+#include "chunk.h"
 typedef struct fl
 {
     int numChunks;

@@ -42,4 +42,6 @@ endif
 
 
 clean:
-	rm -rf $(BUILDDIR)/*
+	rm -rf $(BUILDDIR)/lib/*
+	rm -rf $(BUILDDIR)/obj/*
+	rm $(BUILDDIR)/test

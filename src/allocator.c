@@ -21,6 +21,12 @@ static struct MEM_HEAP
 } heap;
 static fl_t fl;
 
+nmchunk_t *getHeader(void *mem)
+{
+    nmchunk_t *chunk = (mem - sizeof(nmchunk_t));
+    return chunk;
+}
+
 static void _initfl(fl_t *fl)
 {
     fl->numChunks = 0;
@@ -104,9 +110,7 @@ nmchunk_t *getChunk(struct MEM_HEAP *heap, size_t size)
     heap->amntUsed += totalSize;
     heap->amntFree -= totalSize;
     memset(chunk->data, 0, chunk->size);
-#ifdef DEBUG
-    printInfo("address of chunk is %p the size is %lu", chunk, size);
-#endif
+
     return chunk;
 }
 void *notmalloc(size_t size)
