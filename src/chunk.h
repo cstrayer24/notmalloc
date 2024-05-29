@@ -12,10 +12,6 @@ extern "C"
 #include "smTypes.h"
 #define DEFchunkSIZE 2048
 #define NMCHUNK struct nmchunk
-    nmchunk_t *chunkifyPage(page_t pg, int *numchunk);
-    nmchunk_t *chunkifyPageSN(page_t pg, int numchunk, size_t size);
-    nmchunk_t *chunkifyPageN(page_t pg, int numchunk, size_t *chunkSize);
-    nmchunk_t *chunkifyPageS(page_t pg, size_t chunkSize, int *numChunks);
     nmchunk_t *subDivideChunk(nmchunk_t *chunk);
     nmchunk_t *getHeader(void *rawPtr);
 

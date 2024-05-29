@@ -9,6 +9,8 @@
 #include <sys/mman.h>
 #include <stdio.h>
 
+#define INRANGE(mi, vl, mx) ((mi) <= (vl) && (vl) <= (mx))
+
 static struct MEM_HEAP
 {
 
@@ -71,7 +73,6 @@ bool initheap(struct MEM_HEAP *heap)
 }
 bool expandHeap(struct MEM_HEAP *heap, size_t targetSize)
 {
-
     if (!expandPage(heap->contents))
     {
 
@@ -116,10 +117,31 @@ void *notmalloc(size_t size)
         return NULL;
     }
     nmchunk_t *newChunk;
+    if (fl_isEmpty(&fl))
+    {
+        newChunk = getChunk(&heap, alignedSize);
+        return newChunk->data;
+    }
+    if (alignedSize == fl.minSize || fl.minSize + sizeof(word_t) == alignedSize)
+    {
+        newChunk = fl_smallestChunk(&fl);
+        fl_remove(&fl, newChunk);
+        return newChunk->data;
+    }
+    if (alignedSize == fl.maxSize || fl.maxSize + sizeof(word_t) == alignedSize)
+    {
+        newChunk = fl_largestChunk(&fl);
+        fl_remove(&fl, newChunk);
+        return newChunk->data;
+    }
 
+    if (INRANGE(fl.minSize, alignedSize, fl.maxSize))
+    {
+        newChunk = fl_getChunk(&fl, alignedSize);
+        fl_remove(&fl, newChunk);
+        return newChunk->data;
+    }
     newChunk = getChunk(&heap, alignedSize);
-    newChunk->next = NULL;
-    newChunk->prev = NULL;
     return newChunk->data;
 }
 
