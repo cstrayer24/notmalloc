@@ -17,6 +17,9 @@ endif
 ifeq ($(osname), Darwin)
 LIBFLAGS=-dynamiclib -fPIC
 LIBTARGET=libnotmalloc.dylib
+else ($(osname),Linux)
+LIBFLAGS=-shared -fPIC
+LIBTARGET=libnotmalloc.so
 endif
 
 all:build-lib
