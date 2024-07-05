@@ -3,6 +3,16 @@
 #include "debug/debug.h"
 #include "align.h"
 #define INRANGE(mi, vl, mx) ((mi) <= (vl) && (vl) <= (mx))
+
+void fl_init(fl_t *fl)
+{
+    fl->numChunks = 0;
+    fl->maxSize = 0;
+    fl->minSize = 0;
+    fl->start = NULL;
+    fl->end = NULL;
+    fl->curr = NULL;
+}
 nmchunk_t *fl_smallestChunk(fl_t *fl)
 {
 

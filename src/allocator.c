@@ -1,9 +1,9 @@
 #include "allocator.h"
-#include "debug/debug.h"
 #include "sysmem.h"
 #include "align.h"
 #include "chunk.h"
 #include "fl.h"
+#include "mem_heap.h"
 
 #include <unistd.h>
 #include <sys/mman.h>
@@ -11,119 +11,37 @@
 
 #define INRANGE(mi, vl, mx) ((mi) <= (vl) && (vl) <= (mx))
 
-static struct MEM_HEAP
-{
-
-    void *contents;
-    size_t size;
-    size_t amntFree;
-    size_t amntUsed;
-} heap;
 static fl_t fl;
-
+static heap_t heap;
 nmchunk_t *getHeader(void *mem)
 {
     nmchunk_t *chunk = (mem - sizeof(nmchunk_t));
     return chunk;
 }
 
-static void _initfl(fl_t *fl)
-{
-    fl->numChunks = 0;
-    fl->maxSize = 0;
-    fl->minSize = 0;
-    fl->start = NULL;
-    fl->end = NULL;
-    fl->curr = NULL;
-}
-
-void initfl(fl_t *fl)
-{
-
-    static bool hasBeenInit = false;
-
-    if (!hasBeenInit)
-    {
-
-        _initfl(fl);
-        hasBeenInit = true;
-    }
-}
-static bool _initheap(struct MEM_HEAP *heap)
-{
-
-    if ((heap->contents = getPage()) == NULL)
-    {
-        return false;
-    }
-    heap->size = getpagesize();
-    heap->amntFree = heap->size;
-    heap->amntUsed = 0;
-    return true;
-}
-bool initheap(struct MEM_HEAP *heap)
-{
-    static bool hasBeenInitalized = 0;
-    if (!hasBeenInitalized)
-    {
-
-        if (_initheap(heap))
-        {
-            return 1;
-        }
-
-        return 0;
-    }
-
-    return 1;
-}
-bool expandHeap(struct MEM_HEAP *heap, size_t targetSize)
-{
-    if (!expandPage(heap->contents))
-    {
-
-        return 0;
-    }
-    heap->size += getpagesize();
-    heap->amntFree += getpagesize();
-    if (heap->size < targetSize)
-    {
-
-        return expandHeap(heap, targetSize);
-    }
-
-    return 1;
-}
-nmchunk_t *getChunk(struct MEM_HEAP *heap, size_t size)
-{
-
-    if (heap->amntFree <= size | heap->amntFree - size <= 0)
-    {
-        size_t targetSize = heap->size + size;
-        expandHeap(heap, targetSize);
-    }
-    size_t totalSize = sizeof(nmchunk_t) + size;
-    nmchunk_t *chunk = (nmchunk_t *)((void *)heap->contents + heap->amntUsed);
-    chunk->isfree = false;
-    chunk->size = size;
-    chunk->data = (void *)((void *)chunk + sizeof(nmchunk_t));
-    heap->amntUsed += totalSize;
-    heap->amntFree -= totalSize;
-    memset(chunk->data, 0, chunk->size);
-
-    return chunk;
-}
 void *notmalloc(size_t size)
 {
-    size_t alignedSize = align(size);
-    if (!initheap(&heap))
+
+    static bool fl_hasbeeninit = false;
+    if (!fl_hasbeeninit)
     {
-        return NULL;
+        fl_init(&fl);
+        fl_hasbeeninit = true;
     }
+
+    static bool heap_hasbeeninit = false;
+    if (!heap_hasbeeninit)
+    {
+        mh_init(&heap);
+        heap_hasbeeninit = true;
+    }
+    size_t alignedSize = align(size);
+
     nmchunk_t *newChunk;
     if (fl_isEmpty(&fl))
     {
-        newChunk = getChunk(&heap, alignedSize);
+        newChunk = mh_getChunk(&heap, alignedSize);
+
         return newChunk->data;
     }
     if (alignedSize == fl.minSize || fl.minSize + sizeof(word_t) == alignedSize)
@@ -145,7 +63,7 @@ void *notmalloc(size_t size)
         fl_remove(&fl, newChunk);
         return newChunk->data;
     }
-    newChunk = getChunk(&heap, alignedSize);
+    newChunk = mh_getChunk(&heap, alignedSize);
     return newChunk->data;
 }
 
