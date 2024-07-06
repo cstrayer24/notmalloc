@@ -4,21 +4,19 @@ BUILDDIR=./build
 OBJDIR=$(BUILDDIR)/obj
 PPMACROS=
 CFLAGS=-Wall
-LIBFLAGS=
+LIBFLAGS=-fPIC
 LIBTARGET=
 osname:=$(shell uname -s)
 OBJS = $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/obj/%.o,$(wildcard $(SRCDIR)/*.c))
-SYSMEM=$(patsubst $(SRCDIR)/systemMem/%.c,$(BUILDDIR)/obj/%.o,$(wildcard $(SRCDIR)/systemMem/*.c))
-$(info $(SYSMEM))
 ifdef DEBUG
-	PPMACROS=-DDEBUG
+CFLAGS+=-DDEBUG
 endif
 
 ifeq ($(osname), Darwin)
-LIBFLAGS=-dynamiclib -fPIC
+LIBFLAGS+=-dynamiclib
 LIBTARGET=libnotmalloc.dylib
 else ($(osname),Linux)
-LIBFLAGS=-shared -fPIC
+LIBFLAGS+=-shared 
 LIBTARGET=libnotmalloc.so
 endif
 
@@ -29,17 +27,17 @@ endif
 
 
 build-lib:$(OBJS)
-	$(CC) $(wildcard $(BUILDDIR)/obj/*.o)  $(LIBFLAGS) -o $(BUILDDIR)/lib/$(LIBTARGET)
+	$(CC) $(wildcard $(BUILDDIR)/obj/*.o) $(CFLAGS) $(LIBFLAGS) -o $(BUILDDIR)/lib/$(LIBTARGET)
 
 
 $(OBJDIR)/%.o:$(SRCDIR)/%.c build-debug 
-	$(CC) $(CFLAGS) $(PPMACROS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 
 
 build-debug:
 ifdef DEBUG
-	$(CC) $(PPMACROS) -c $(wildcard $(SRCDIR)/debug/*.c) -o $(BUILDDIR)/obj/debug.o
+	$(CC) $(CFLAGS) -c $(wildcard $(SRCDIR)/debug/*.c) -o $(BUILDDIR)/obj/debug.o
 endif
 
 

@@ -8,6 +8,4 @@ int main()
     {
         mint[i] = i; /* code */
     }
-
-    
 }
