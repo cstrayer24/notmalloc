@@ -1,4 +1,4 @@
-#include "./align.h"
+#include "align.h"
 // http://dmitrysoshnikov.com/compilers/writing-a-memory-allocator/
 size_t align(size_t initialSize)
 {

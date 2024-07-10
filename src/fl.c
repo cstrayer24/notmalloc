@@ -122,7 +122,6 @@ void fl_insert(fl_t *fl, nmchunk_t *chunk)
     {
         fl->start = chunk;
         fl->end = chunk;
-        fl->curr = chunk;
         fl->maxSize = chunk->size;
         fl->minSize = chunk->size;
         fl->numChunks++;

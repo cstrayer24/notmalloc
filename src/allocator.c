@@ -13,13 +13,11 @@
 
 static fl_t fl;
 static heap_t heap;
-nmchunk_t *getHeader(void *mem)
+static nmchunk_t *getHeader(void *mem)
 {
-    nmchunk_t *chunk = (mem - sizeof(nmchunk_t));
-    return chunk;
+    return (nmchunk_t *)(mem - sizeof(nmchunk_t));
 }
-
-void *notmalloc(size_t size)
+static nmchunk_t *getFittedChunk(size_t targetSize)
 {
 
     static bool fl_hasbeeninit = false;
@@ -35,38 +33,48 @@ void *notmalloc(size_t size)
         mh_init(&heap);
         heap_hasbeeninit = true;
     }
-    size_t alignedSize = align(size);
+    size_t alignedSize = align(targetSize);
 
     nmchunk_t *newChunk;
     if (fl_isEmpty(&fl))
     {
         newChunk = mh_getChunk(&heap, alignedSize);
 
-        return newChunk->data;
+        return newChunk;
     }
     if (alignedSize == fl.minSize || fl.minSize + sizeof(word_t) == alignedSize)
     {
         newChunk = fl_smallestChunk(&fl);
         fl_remove(&fl, newChunk);
-        return newChunk->data;
+        return newChunk;
     }
     if (alignedSize == fl.maxSize || fl.maxSize + sizeof(word_t) == alignedSize)
     {
         newChunk = fl_largestChunk(&fl);
         fl_remove(&fl, newChunk);
-        return newChunk->data;
+        return newChunk;
     }
 
     if (INRANGE(fl.minSize, alignedSize, fl.maxSize))
     {
         newChunk = fl_getChunk(&fl, alignedSize);
         fl_remove(&fl, newChunk);
-        return newChunk->data;
+        return newChunk;
     }
     newChunk = mh_getChunk(&heap, alignedSize);
-    return newChunk->data;
+    return newChunk;
 }
-
+void *notmalloc(size_t size)
+{
+    nmchunk_t *chunk = getFittedChunk(size);
+    return chunk->data;
+}
+void *notcalloc(size_t count, size_t size)
+{
+    nmchunk_t *chunk = getFittedChunk(count * size);
+    memset(chunk->data, 0, chunk->size);
+    return chunk->data;
+}
 void notfree(void *mem)
 {
     nmchunk_t *chunk = getHeader(mem);

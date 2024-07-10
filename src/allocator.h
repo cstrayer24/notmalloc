@@ -7,7 +7,7 @@ extern "C"
 #include <strings.h> //for size_t
 
     void *notmalloc(size_t size);
-
+    void *notcalloc(size_t count, size_t size);
     void notfree(void *mem);
 #ifdef __cplusplus
 }
