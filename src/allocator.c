@@ -4,10 +4,10 @@
 #include "chunk.h"
 #include "fl.h"
 #include "mem_heap.h"
+#include "debug/debug.h"
 
 #include <unistd.h>
 #include <sys/mman.h>
-#include <stdio.h>
 
 #define INRANGE(mi, vl, mx) ((mi) <= (vl) && (vl) <= (mx))
 
@@ -34,7 +34,6 @@ static nmchunk_t *getFittedChunk(size_t targetSize)
         heap_hasbeeninit = true;
     }
     size_t alignedSize = align(targetSize);
-
     nmchunk_t *newChunk;
     if (fl_isEmpty(&fl))
     {
@@ -66,6 +65,7 @@ static nmchunk_t *getFittedChunk(size_t targetSize)
 }
 void *notmalloc(size_t size)
 {
+    // printFL(&fl);
     nmchunk_t *chunk = getFittedChunk(size);
     return chunk->data;
 }
@@ -78,6 +78,5 @@ void *notcalloc(size_t count, size_t size)
 void notfree(void *mem)
 {
     nmchunk_t *chunk = getHeader(mem);
-
     return fl_insert(&fl, chunk);
 }

@@ -1,5 +1,6 @@
 #include "mem_heap.h"
 #include "sysmem.h"
+#include "debug/debug.h"
 
 #include <unistd.h>
 bool mh_init(heap_t *mh)
@@ -35,7 +36,7 @@ static bool mh_expand(heap_t *mh, size_t targetSize)
 
 nmchunk_t *mh_getChunk(heap_t *mh, size_t size)
 {
-    if (mh->amntFree <= size | mh->amntFree - size <= 0)
+    if (mh->amntFree <= size || mh->amntFree - size <= 0)
     {
         size_t targetSize = mh->size + size;
         mh_expand(mh, targetSize);

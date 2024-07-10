@@ -15,14 +15,18 @@ void fl_init(fl_t *fl)
 }
 nmchunk_t *fl_smallestChunk(fl_t *fl)
 {
-
+    printInfo("in smallest chunk");
+    if (fl->numChunks == 1)
+    {
+        printInfo("right here");
+        return fl->start;
+    }
     nmchunk_t *smallest = NULL;
     nmchunk_t *endptr = fl->end;
     nmchunk_t *startptr = fl->start;
 
     while (endptr != startptr)
     {
-
         if (smallest == NULL)
         {
             if (startptr->size >= endptr->size)
@@ -100,6 +104,7 @@ nmchunk_t *fl_largestChunk(fl_t *fl)
 
 nmchunk_t *fl_getChunk(fl_t *fl, size_t targetSize)
 {
+
     size_t realTargetSize = alignForChunk(targetSize);
     while ((fl->curr->size / realTargetSize < 2) && fl->curr != NULL)
     {
@@ -120,6 +125,7 @@ void fl_insert(fl_t *fl, nmchunk_t *chunk)
 {
     if (fl_isEmpty(fl))
     {
+        printInfo("in here");
         fl->start = chunk;
         fl->end = chunk;
         fl->maxSize = chunk->size;
@@ -133,6 +139,12 @@ void fl_insert(fl_t *fl, nmchunk_t *chunk)
 
     chunk->prev = fl->end;
     chunk->next = NULL;
+    fl->end->next = chunk;
+    if (fl->start->next == NULL)
+    {
+        printInfo("right here");
+        fl->start->next = fl->end;
+    }
     fl->maxSize = chunk->size > fl->maxSize ? chunk->size : fl->maxSize;
     fl->minSize = chunk->size < fl->minSize ? chunk->size : fl->minSize;
     fl->numChunks++;
@@ -141,8 +153,22 @@ void fl_insert(fl_t *fl, nmchunk_t *chunk)
 }
 void fl_remove(fl_t *fl, nmchunk_t *chunk)
 {
-    chunk->next->prev = chunk->prev;
-    chunk->prev->next = chunk->next;
+    printChunk(chunk);
+    if (!chunk->isfree)
+    {
+        return;
+    }
+    printInfo("removing chunk");
+    if (chunk->next)
+    {
+
+        chunk->next->prev = chunk->prev;
+    }
+    if (chunk->prev)
+    {
+
+        chunk->prev->next = chunk->next;
+    }
     chunk->prev = NULL;
     chunk->next = NULL;
     chunk->isfree = false;

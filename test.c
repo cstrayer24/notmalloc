@@ -2,18 +2,15 @@
 #include <stdio.h>
 int main()
 {
-
-    int *mint = notmalloc(sizeof(int) * 10);
-    int *intarr = notcalloc(10, sizeof(int));
-    for (size_t i = 0; i < 10; i++)
-    {
-        intarr[i] = i; /* code */
-    }
-    for (size_t i = 0; i < 10; i++)
-    {
-        printf("%d\n", intarr[i]);
-    }
-
-
-    notfree(intarr);
+    char *str = notmalloc(sizeof(char) * 10);
+    char *str2 = notmalloc(sizeof(char) * 15);
+    void *thing = notmalloc(100);
+    int *it = notmalloc(sizeof(int));
+    notfree(str);
+    notfree(str2);
+    notfree(thing);
+    notfree(it);
+    char *str3 = notmalloc(sizeof(char) * 10);
+    void *thing2 = notmalloc(100);
+    
 }
