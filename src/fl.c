@@ -15,10 +15,8 @@ void fl_init(fl_t *fl)
 }
 nmchunk_t *fl_smallestChunk(fl_t *fl)
 {
-    printInfo("in smallest chunk");
     if (fl->numChunks == 1)
     {
-        printInfo("right here");
         return fl->start;
     }
     nmchunk_t *smallest = NULL;
@@ -31,12 +29,10 @@ nmchunk_t *fl_smallestChunk(fl_t *fl)
         {
             if (startptr->size >= endptr->size)
             {
-
                 smallest = startptr;
             }
             else
             {
-
                 smallest = endptr;
             }
             endptr = endptr->prev;
@@ -62,10 +58,14 @@ nmchunk_t *fl_smallestChunk(fl_t *fl)
 }
 nmchunk_t *fl_largestChunk(fl_t *fl)
 {
+    if (fl->numChunks == 1)
+    {
+        return fl->start;
+    }
+
     nmchunk_t *largest = NULL;
     nmchunk_t *startptr = fl->start;
     nmchunk_t *endptr = fl->end;
-
     while (startptr != endptr)
     {
         if (largest == NULL)
@@ -123,50 +123,54 @@ nmchunk_t *fl_getChunk(fl_t *fl, size_t targetSize)
 }
 void fl_insert(fl_t *fl, nmchunk_t *chunk)
 {
+    chunk->isfree = true;
+    fl->numChunks++;
+
     if (fl_isEmpty(fl))
     {
-        printInfo("in here");
         fl->start = chunk;
         fl->end = chunk;
-        fl->maxSize = chunk->size;
-        fl->minSize = chunk->size;
-        fl->numChunks++;
-        chunk->isfree = true;
         chunk->prev = NULL;
         chunk->next = NULL;
+        fl->maxSize = chunk->size;
+        fl->minSize = chunk->size;
         return;
     }
 
-    chunk->prev = fl->end;
-    chunk->next = NULL;
-    fl->end->next = chunk;
-    if (fl->start->next == NULL)
-    {
-        printInfo("right here");
-        fl->start->next = fl->end;
-    }
     fl->maxSize = chunk->size > fl->maxSize ? chunk->size : fl->maxSize;
     fl->minSize = chunk->size < fl->minSize ? chunk->size : fl->minSize;
-    fl->numChunks++;
-    chunk->isfree = true;
+    if (fl->start == fl->end)
+    {
+        fl->end = chunk;
+        fl->start->next = fl->end;
+        fl->end->prev = fl->start;
+        return;
+    }
+    chunk->prev = fl->end;
+    fl->end->next = chunk;
     fl->end = chunk;
+    chunk->next = NULL;
 }
 void fl_remove(fl_t *fl, nmchunk_t *chunk)
 {
-    printChunk(chunk);
     if (!chunk->isfree)
     {
         return;
     }
-    printInfo("removing chunk");
+    if (chunk == fl->start)
+    {
+        fl->start = fl->start->next;
+    }
+    if (chunk == fl->end)
+    {
+        fl->end = fl->end->prev;
+    }
     if (chunk->next)
     {
-
         chunk->next->prev = chunk->prev;
     }
     if (chunk->prev)
     {
-
         chunk->prev->next = chunk->next;
     }
     chunk->prev = NULL;

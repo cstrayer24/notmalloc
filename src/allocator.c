@@ -19,53 +19,43 @@ static nmchunk_t *getHeader(void *mem)
 }
 static nmchunk_t *getFittedChunk(size_t targetSize)
 {
-
-    static bool fl_hasbeeninit = false;
-    if (!fl_hasbeeninit)
+    static bool allocatorStructuresHaveBeenInit = false;
+    if (!allocatorStructuresHaveBeenInit)
     {
         fl_init(&fl);
-        fl_hasbeeninit = true;
+        mh_init(&heap);
+        allocatorStructuresHaveBeenInit = true;
     }
 
-    static bool heap_hasbeeninit = false;
-    if (!heap_hasbeeninit)
-    {
-        mh_init(&heap);
-        heap_hasbeeninit = true;
-    }
     size_t alignedSize = align(targetSize);
     nmchunk_t *newChunk;
-    if (fl_isEmpty(&fl))
+    if (!fl_isEmpty(&fl))
     {
-        newChunk = mh_getChunk(&heap, alignedSize);
+        if (alignedSize == fl.minSize || fl.minSize + sizeof(word_t) == alignedSize)
+        {
+            newChunk = fl_smallestChunk(&fl);
+            fl_remove(&fl, newChunk);
+            return newChunk;
+        }
+        if (alignedSize == fl.maxSize || fl.maxSize + sizeof(word_t) == alignedSize)
+        {
+            newChunk = fl_largestChunk(&fl);
+            fl_remove(&fl, newChunk);
+            return newChunk;
+        }
 
-        return newChunk;
-    }
-    if (alignedSize == fl.minSize || fl.minSize + sizeof(word_t) == alignedSize)
-    {
-        newChunk = fl_smallestChunk(&fl);
-        fl_remove(&fl, newChunk);
-        return newChunk;
-    }
-    if (alignedSize == fl.maxSize || fl.maxSize + sizeof(word_t) == alignedSize)
-    {
-        newChunk = fl_largestChunk(&fl);
-        fl_remove(&fl, newChunk);
-        return newChunk;
-    }
-
-    if (INRANGE(fl.minSize, alignedSize, fl.maxSize))
-    {
-        newChunk = fl_getChunk(&fl, alignedSize);
-        fl_remove(&fl, newChunk);
-        return newChunk;
+        if (INRANGE(fl.minSize, alignedSize, fl.maxSize))
+        {
+            newChunk = fl_getChunk(&fl, alignedSize);
+            fl_remove(&fl, newChunk);
+            return newChunk;
+        }
     }
     newChunk = mh_getChunk(&heap, alignedSize);
     return newChunk;
 }
 void *notmalloc(size_t size)
 {
-    // printFL(&fl);
     nmchunk_t *chunk = getFittedChunk(size);
     return chunk->data;
 }

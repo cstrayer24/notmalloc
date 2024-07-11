@@ -9,7 +9,7 @@ LIBTARGET=
 osname:=$(shell uname -s)
 OBJS = $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/obj/%.o,$(wildcard $(SRCDIR)/*.c))
 ifdef DEBUG
-CFLAGS+=-DDEBUG
+CFLAGS+=-DDEBUG -g
 endif
 
 ifeq ($(osname), Darwin)
@@ -45,4 +45,5 @@ endif
 clean:
 	rm -rf $(BUILDDIR)/lib/*
 	rm -rf $(BUILDDIR)/obj/*
+	rm -rf $(BUILDDIR)/test.dSYM
 	rm $(BUILDDIR)/test

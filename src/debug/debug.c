@@ -26,6 +26,7 @@ void printChunk(nmchunk_t *chunk)
         printInfo("null chunk found");
         return;
     }
+    printInfo("the chunks address is %p");
     printInfo("the chunks size is %lu", chunk->size);
     printInfo("the chunk %s free", chunk->isfree ? "is" : "isn't");
     printInfo("the previous pointer is %p", chunk->prev);
@@ -43,10 +44,4 @@ void printFL(fl_t *fl)
     printInfo("the number of chunks is %d", fl->numChunks);
     printInfo("the max size is %lu and the min size is %lu", fl->maxSize, fl->minSize);
     printInfo("the start pointer is %p the curr pointer is %p and the end is %p", fl->start, fl->curr, fl->end);
-    nmchunk_t *temp = fl->start;
-    while (temp || temp == NULL)
-    {
-        printChunk(temp);
-        temp = temp->next;
-    }
 }

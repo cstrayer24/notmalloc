@@ -12,5 +12,4 @@ int main()
     notfree(it);
     char *str3 = notmalloc(sizeof(char) * 10);
     void *thing2 = notmalloc(100);
-    
 }
