@@ -24,13 +24,7 @@ static nmchunk_t *getHeader(void *mem)
 }
 static nmchunk_t *getFittedChunk(size_t targetSize)
 {
-    // static bool allocatorStructuresHaveBeenInit = false;
-    // if (!allocatorStructuresHaveBeenInit)
-    // {
-    //     fl_init(&fl);
-    //     mh_init(&heap);
-    //     allocatorStructuresHaveBeenInit = true;
-    // }
+  
 
     size_t alignedSize = align(targetSize);
     nmchunk_t *newChunk;

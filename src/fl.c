@@ -104,7 +104,10 @@ nmchunk_t *fl_largestChunk(fl_t *fl)
 
 nmchunk_t *fl_getChunk(fl_t *fl, size_t targetSize)
 {
-
+    if (fl->curr == NULL)
+    {
+        fl->curr = fl->start;
+    }
     size_t realTargetSize = alignForChunk(targetSize);
     while ((fl->curr->size / realTargetSize < 2) && fl->curr != NULL)
     {
@@ -117,8 +120,6 @@ nmchunk_t *fl_getChunk(fl_t *fl, size_t targetSize)
     newChunk->size = targetSize;
     fl->curr->next = newChunk;
     fl->curr->size -= realTargetSize;
-    fl->curr = newChunk;
-
     return newChunk;
 }
 void fl_insert(fl_t *fl, nmchunk_t *chunk)
