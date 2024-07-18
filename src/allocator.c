@@ -13,19 +13,24 @@
 
 static fl_t fl;
 static heap_t heap;
+__attribute__((constructor)) static void nm_init()
+{
+    fl_init(&fl);
+    mh_init(&heap);
+}
 static nmchunk_t *getHeader(void *mem)
 {
     return (nmchunk_t *)(mem - sizeof(nmchunk_t));
 }
 static nmchunk_t *getFittedChunk(size_t targetSize)
 {
-    static bool allocatorStructuresHaveBeenInit = false;
-    if (!allocatorStructuresHaveBeenInit)
-    {
-        fl_init(&fl);
-        mh_init(&heap);
-        allocatorStructuresHaveBeenInit = true;
-    }
+    // static bool allocatorStructuresHaveBeenInit = false;
+    // if (!allocatorStructuresHaveBeenInit)
+    // {
+    //     fl_init(&fl);
+    //     mh_init(&heap);
+    //     allocatorStructuresHaveBeenInit = true;
+    // }
 
     size_t alignedSize = align(targetSize);
     nmchunk_t *newChunk;
