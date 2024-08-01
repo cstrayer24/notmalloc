@@ -6,9 +6,6 @@
 #include "mem_heap.h"
 #include "debug/debug.h"
 
-#include <unistd.h>
-#include <sys/mman.h>
-
 #define INRANGE(mi, vl, mx) ((mi) <= (vl) && (vl) <= (mx))
 
 static fl_t fl;
@@ -24,7 +21,6 @@ static nmchunk_t *getHeader(void *mem)
 }
 static nmchunk_t *getFittedChunk(size_t targetSize)
 {
-  
 
     size_t alignedSize = align(targetSize);
     nmchunk_t *newChunk;

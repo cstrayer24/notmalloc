@@ -1,13 +1,24 @@
 #include "./sysmem.h"
-
+// check if on a unix like OS
+#if defined(__APPLE__) || defined(__unix__) || defined(__linux__)
 #include <unistd.h>
 #include <sys/mman.h>
+#endif
+int getpgSize()
+{
+// unix version
+#if defined(__APPLE__) || defined(__unix__) || defined(__linux__)
 
+    return getpagesize();
+#endif
+}
 page_t getPage()
 {
+// unix version
+#if defined(__APPLE__) || defined(__unix__) || defined(__linux__)
     page_t pg;
 
-    pg = mmap(NULL, getpagesize(), PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+    pg = mmap(NULL, getpgSize(), PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
     if (pg == MAP_FAILED)
     {
 
@@ -15,14 +26,17 @@ page_t getPage()
     }
 
     return pg;
+#endif
 }
 bool expandPage(page_t page)
 {
-    if (mmap(page, getpagesize(), PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0) == MAP_FAILED)
+#if defined(__APPLE__) || defined(__unix__) || defined(__linux__)
+    if (mmap(page, getpgSize(), PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0) == MAP_FAILED)
     {
 
         return 0;
     }
 
     return 1;
+#endif
 }

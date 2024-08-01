@@ -3,8 +3,9 @@ SRCDIR=./src
 BUILDDIR=./build
 OBJDIR=$(BUILDDIR)/obj
 CFLAGS=-Wall
-LIBFLAGS=-fPIC
-LIBTARGET=
+#most operating systems use shared object as the shared library format so make it the default then check if its being built on Mac or Windows
+LIBFLAGS=-fPIC -shared
+LIBTARGET=libnotmalloc.so
 osname:=$(shell uname -s)
 OBJS = $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/obj/%.o,$(wildcard $(SRCDIR)/*.c))
 ifdef DEBUG
@@ -12,11 +13,8 @@ CFLAGS+=-DDEBUG -g
 endif
 
 ifeq ($(osname), Darwin)
-LIBFLAGS+=-dynamiclib
+LIBFLAGS=-fPIC -dynamiclib
 LIBTARGET=libnotmalloc.dylib
-else ($(osname),Linux)
-LIBFLAGS+=-shared 
-LIBTARGET=libnotmalloc.so
 endif
 
 all:build-lib

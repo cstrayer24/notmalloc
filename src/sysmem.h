@@ -5,4 +5,5 @@
 #include "smTypes.h"
 page_t getPage();
 bool expandPage(page_t page);
+int getpgSize();
 #endif
