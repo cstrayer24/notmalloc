@@ -6,10 +6,16 @@
 #endif
 int getpgSize()
 {
+    static int pgSize = 0;
+    if (pgSize)
+    {
+        return pgSize;
+    }
 // unix version
 #if defined(__APPLE__) || defined(__unix__) || defined(__linux__)
 
-    return getpagesize();
+    pgSize = getpagesize();
+    return pgSize;
 #endif
 }
 page_t getPage()
